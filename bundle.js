@@ -7910,7 +7910,7 @@ var _user$project$Main$showWinner = function (model) {
 				A2(
 					_elm_lang$core$Basics_ops['++'],
 					'Winner = ',
-					_elm_lang$core$Basics$toString(model.winner))) : (model.draw ? _elm_lang$html$Html$text('DRAW!') : _elm_lang$html$Html$text(
+					_elm_lang$core$String$fromChar(model.winner))) : (model.draw ? _elm_lang$html$Html$text('DRAW!') : _elm_lang$html$Html$text(
 				A2(
 					_elm_lang$core$Basics_ops['++'],
 					_elm_lang$core$String$fromChar(model.turn),
@@ -8212,26 +8212,31 @@ var _user$project$Main$makeBoardCells = function (boardRow) {
 					_elm_lang$core$Native_List.fromArray(
 						[
 							_elm_lang$html$Html$text(
-							_elm_lang$core$Native_Utils.eq(
-								cell.value,
-								_elm_lang$core$Native_Utils.chr('X')) ? 'X' : (_elm_lang$core$Native_Utils.eq(
-								cell.value,
-								_elm_lang$core$Native_Utils.chr('O')) ? 'O' : '[]'))
+							_elm_lang$core$String$fromChar(cell.value))
 						]));
 			},
 			boardRow));
 };
 var _user$project$Main$makeBoard = function (model) {
 	return A2(
-		_elm_lang$html$Html$ul,
+		_elm_lang$html$Html$div,
 		_elm_lang$core$Native_List.fromArray(
-			[]),
-		A2(
-			_elm_lang$core$List$map,
-			function (boardRow) {
-				return _user$project$Main$makeBoardCells(boardRow);
-			},
-			model.board));
+			[
+				_elm_lang$html$Html_Attributes$class('board')
+			]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				A2(
+				_elm_lang$html$Html$ul,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				A2(
+					_elm_lang$core$List$map,
+					function (boardRow) {
+						return _user$project$Main$makeBoardCells(boardRow);
+					},
+					model.board))
+			]));
 };
 var _user$project$Main$Clear = {ctor: 'Clear'};
 var _user$project$Main$clearButton = A2(
@@ -8255,7 +8260,9 @@ var _user$project$Main$view = function (model) {
 				A2(
 				_elm_lang$html$Html$h1,
 				_elm_lang$core$Native_List.fromArray(
-					[]),
+					[
+						_elm_lang$html$Html_Attributes$class('titulo')
+					]),
 				_elm_lang$core$Native_List.fromArray(
 					[
 						_elm_lang$html$Html$text('Tic Tac Toe')

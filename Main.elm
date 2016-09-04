@@ -274,7 +274,7 @@ updateCell model posx posy =
 view : Model -> Html Msg
 view model =
     div []
-        [ h1 [] [ text "Tic Tac Toe" ]
+        [ h1 [ class "titulo" ] [ text "Tic Tac Toe" ]
         , showWinner model
         , makeBoard model
         , clearButton
@@ -285,7 +285,7 @@ showWinner : Model -> Html Msg
 showWinner model =
     h1 []
         [ if model.winner /= ' ' then
-            text ("Winner = " ++ toString (model.winner))
+            text ("Winner = " ++ (String.fromChar model.winner))
           else if model.draw then
             text "DRAW!"
           else
@@ -300,13 +300,15 @@ clearButton =
 
 makeBoard : Model -> Html Msg
 makeBoard model =
-    ul []
-        (List.map
-            (\boardRow ->
-                makeBoardCells boardRow
+    div [ class "board" ]
+        [ ul []
+            (List.map
+                (\boardRow ->
+                    makeBoardCells boardRow
+                )
+                model.board
             )
-            model.board
-        )
+        ]
 
 
 makeBoardCells : List Tile -> Html Msg
@@ -317,13 +319,7 @@ makeBoardCells boardRow =
                 div
                     [ class "button", onClick (Place cell.x cell.y) ]
                     [ text
-                        (if cell.value == 'X' then
-                            "X"
-                         else if cell.value == 'O' then
-                            "O"
-                         else
-                            "[]"
-                        )
+                        (String.fromChar cell.value)
                     ]
             )
             boardRow

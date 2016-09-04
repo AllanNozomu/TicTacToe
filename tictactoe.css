@@ -11,11 +11,28 @@ body {
   display: flex;
   justify-content: center;
   text-align: center;
-  font-family: fantasy;
+  font-family: 'Baloo Tamma', cursive;
+}
+
+button{
+  background-color: #26e4b6;
+  font-size: 24px;
+  border-style: none;
+}
+
+.titulo{
+  font-size: 50px;
+  margin-bottom: 0;
+}
+
+.board{
+  width: 310px;
 }
 
 .button{
-  min-width: 33%;
-  max-width: 33%;
-  font-size: 100px;
+  width: 100px;
+  height: 100px;
+  border-style: solid;
+  background-color: #e8c084;
+  font-size: 72px;
 }
