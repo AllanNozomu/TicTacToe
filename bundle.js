@@ -7910,7 +7910,11 @@ var _user$project$Main$showWinner = function (model) {
 				A2(
 					_elm_lang$core$Basics_ops['++'],
 					'Winner = ',
-					_elm_lang$core$Basics$toString(model.winner))) : _elm_lang$html$Html$text('-')
+					_elm_lang$core$Basics$toString(model.winner))) : (model.draw ? _elm_lang$html$Html$text('DRAW!') : _elm_lang$html$Html$text(
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					_elm_lang$core$String$fromChar(model.turn),
+					'\'s Turn')))
 			]));
 };
 var _user$project$Main$updateCell = F3(
@@ -8036,6 +8040,27 @@ var _user$project$Main$checkDiagonals = F2(
 			_elm_lang$core$List$length(diag2),
 			3)) ? value : _elm_lang$core$Native_Utils.chr(' ');
 	});
+var _user$project$Main$checkDraw = function (board) {
+	var rows = A2(
+		_elm_lang$core$List$filter,
+		function (row) {
+			return _elm_lang$core$Native_Utils.eq(
+				_elm_lang$core$List$length(
+					A2(
+						_elm_lang$core$List$filter,
+						function (cell) {
+							return !_elm_lang$core$Native_Utils.eq(
+								cell.value,
+								_elm_lang$core$Native_Utils.chr(' '));
+						},
+						row)),
+				3);
+		},
+		board);
+	return _elm_lang$core$Native_Utils.eq(
+		_elm_lang$core$List$length(rows),
+		3);
+};
 var _user$project$Main$checkForWinner = function (newBoard) {
 	var winnerDO = A2(
 		_user$project$Main$checkDiagonals,
@@ -8075,9 +8100,9 @@ var _user$project$Main$checkForWinner = function (newBoard) {
 		winnerDX,
 		_elm_lang$core$Native_Utils.chr(' '))))) ? _elm_lang$core$Native_Utils.chr('X') : _elm_lang$core$Native_Utils.chr(' '));
 };
-var _user$project$Main$Model = F3(
-	function (a, b, c) {
-		return {board: a, turn: b, winner: c};
+var _user$project$Main$Model = F4(
+	function (a, b, c, d) {
+		return {board: a, turn: b, winner: c, draw: d};
 	});
 var _user$project$Main$Tile = F3(
 	function (a, b, c) {
@@ -8142,7 +8167,8 @@ var _user$project$Main$initModel = {
 			])
 		]),
 	turn: _elm_lang$core$Native_Utils.chr('X'),
-	winner: _elm_lang$core$Native_Utils.chr(' ')
+	winner: _elm_lang$core$Native_Utils.chr(' '),
+	draw: false
 };
 var _user$project$Main$update = F2(
 	function (msg, model) {
@@ -8157,9 +8183,10 @@ var _user$project$Main$update = F2(
 				model.turn,
 				_elm_lang$core$Native_Utils.chr('X')) ? _elm_lang$core$Native_Utils.chr('O') : _elm_lang$core$Native_Utils.chr('X'));
 			var newWinner = _user$project$Main$checkForWinner(newBoard);
+			var isDraw = _user$project$Main$checkDraw(newBoard);
 			return _elm_lang$core$Native_Utils.update(
 				model,
-				{board: newBoard, turn: newTurn, winner: newWinner});
+				{board: newBoard, turn: newTurn, winner: newWinner, draw: isDraw});
 		}
 	});
 var _user$project$Main$Place = F2(

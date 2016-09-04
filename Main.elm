@@ -14,6 +14,7 @@ type alias Model =
     { board : List (List Tile)
     , turn : Char
     , winner : Char
+    , draw : Bool
     }
 
 
@@ -33,6 +34,7 @@ initModel =
         ]
     , turn = 'X'
     , winner = ' '
+    , draw = False
     }
 
 
@@ -69,8 +71,11 @@ update msg model =
 
                 newWinner =
                     checkForWinner newBoard
+
+                isDraw =
+                    checkDraw newBoard
             in
-                { model | board = newBoard, turn = newTurn, winner = newWinner }
+                { model | board = newBoard, turn = newTurn, winner = newWinner, draw = isDraw }
 
 
 checkForWinner : List (List Tile) -> Char
@@ -100,6 +105,26 @@ checkForWinner newBoard =
             'X'
         else
             ' '
+
+
+checkDraw : List (List Tile) -> Bool
+checkDraw board =
+    let
+        rows =
+            List.filter
+                (\row ->
+                    (List.filter
+                        (\cell ->
+                            cell.value /= ' '
+                        )
+                        row
+                        |> List.length
+                    )
+                        == 3
+                )
+                board
+    in
+        List.length rows == 3
 
 
 checkDiagonals : List (List Tile) -> Char -> Char
@@ -243,7 +268,7 @@ updateCell model posx posy =
 
 
 
---view
+--View
 
 
 view : Model -> Html Msg
@@ -261,8 +286,10 @@ showWinner model =
     h1 []
         [ if model.winner /= ' ' then
             text ("Winner = " ++ toString (model.winner))
+          else if model.draw then
+            text "DRAW!"
           else
-            text "-"
+            text (String.fromChar model.turn ++ "'s Turn")
         ]
 
 
@@ -288,11 +315,7 @@ makeBoardCells boardRow =
         (List.map
             (\cell ->
                 div
-                    -- (if cell.value /= 'X' && cell.value /= 'O' then
                     [ class "button", onClick (Place cell.x cell.y) ]
-                    --  else
-                    -- [ class "button" ]
-                    -- )
                     [ text
                         (if cell.value == 'X' then
                             "X"
