@@ -99,9 +99,9 @@ checkForWinner newBoard =
         winnerDO =
             checkDiagonals newBoard 'O'
     in
-        if winnerCO /= ' ' || winnerRO /= ' ' || winnerDO /= ' ' then
+        if winnerCO || winnerRO || winnerDO then
             'O'
-        else if winnerCX /= ' ' || winnerRX /= ' ' || winnerDX /= ' ' then
+        else if winnerCX || winnerRX || winnerDX then
             'X'
         else
             ' '
@@ -127,7 +127,7 @@ checkDraw board =
         List.length rows == 3
 
 
-checkDiagonals : List (List Tile) -> Char -> Char
+checkDiagonals : List (List Tile) -> Char -> Bool
 checkDiagonals board value =
     let
         diag1 =
@@ -135,15 +135,13 @@ checkDiagonals board value =
                 (\row ->
                     let
                         cells =
-                            List.length
-                                (List.filter
-                                    (\cell ->
-                                        (cell.value == value && cell.x == cell.y)
-                                    )
-                                    row
+                            List.filter
+                                (\cell ->
+                                    (cell.value == value && cell.x == cell.y)
                                 )
+                                row
                     in
-                        (cells == 1)
+                        List.length cells == 1
                 )
                 board
 
@@ -152,79 +150,60 @@ checkDiagonals board value =
                 (\row ->
                     let
                         cells =
-                            List.length
-                                (List.filter
-                                    (\cell ->
-                                        (cell.value == value && cell.x == 2 && cell.y == 0)
-                                            || (cell.value == value && cell.x == 1 && cell.y == 1)
-                                            || (cell.value == value && cell.x == 0 && cell.y == 2)
-                                    )
-                                    row
+                            (List.filter
+                                (\cell ->
+                                    (cell.value == value && cell.x == 2 && cell.y == 0)
+                                        || (cell.value == value && cell.x == 1 && cell.y == 1)
+                                        || (cell.value == value && cell.x == 0 && cell.y == 2)
                                 )
+                                row
+                            )
                     in
-                        (cells == 1)
+                        List.length cells == 1
                 )
                 board
     in
-        if List.length diag1 == 3 || List.length diag2 == 3 then
-            value
-        else
-            ' '
+        List.length diag1 == 3 || List.length diag2 == 3
 
 
-checkColumn : List (List Tile) -> Char -> Char
+columnAux : List (List Tile) -> Char -> Int -> Bool
+columnAux board value numberCol =
+    let
+        rows =
+            List.filter
+                (\row ->
+                    let
+                        cells =
+                            (List.filter
+                                (\cell ->
+                                    cell.value == value && cell.x == numberCol
+                                )
+                                row
+                            )
+                    in
+                        List.length cells == 1
+                )
+                board
+    in
+        List.length rows == 3
+
+
+checkColumn : List (List Tile) -> Char -> Bool
 checkColumn board value =
     let
-        rows0 =
-            List.filter
-                (\list ->
-                    ((List.filter
-                        (\cell ->
-                            cell.value == value && cell.x == 0
-                        )
-                        list
-                     )
-                        |> List.length
-                    )
-                        == 1
-                )
-                board
+        nrows0 =
+            columnAux board value 0
 
-        rows1 =
-            List.filter
-                (\list ->
-                    List.length
-                        (List.filter
-                            (\cell ->
-                                cell.value == value && cell.x == 1
-                            )
-                            list
-                        )
-                        == 1
-                )
-                board
+        nrows1 =
+            columnAux board value 1
 
-        rows2 =
-            List.filter
-                (\list ->
-                    List.length
-                        (List.filter
-                            (\cell ->
-                                cell.value == value && cell.x == 2
-                            )
-                            list
-                        )
-                        == 1
-                )
-                board
+        nrows2 =
+            columnAux board value 2
     in
-        if List.length rows0 == 3 || List.length rows1 == 3 || List.length rows2 == 3 then
-            value
-        else
-            ' '
+        nrows0 || nrows1 || nrows2
 
 
-checkRow : List (List Tile) -> Char -> Char
+checkRow : List (List Tile) -> Char -> Bool
 checkRow board value =
     let
         cols =
@@ -232,22 +211,17 @@ checkRow board value =
                 (\row ->
                     let
                         cells =
-                            List.length
-                                (List.filter
-                                    (\cell ->
-                                        cell.value == value
-                                    )
-                                    row
+                            List.filter
+                                (\cell ->
+                                    cell.value == value
                                 )
+                                row
                     in
-                        (cells == 3)
+                        List.length cells == 3
                 )
                 board
     in
-        if List.length cols == 1 then
-            value
-        else
-            ' '
+        List.length cols == 1
 
 
 updateCell : Model -> Int -> Int -> List (List Tile)

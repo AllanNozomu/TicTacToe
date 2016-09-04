@@ -7940,105 +7940,83 @@ var _user$project$Main$checkRow = F2(
 		var cols = A2(
 			_elm_lang$core$List$filter,
 			function (row) {
-				var cells = _elm_lang$core$List$length(
-					A2(
-						_elm_lang$core$List$filter,
-						function (cell) {
-							return _elm_lang$core$Native_Utils.eq(cell.value, value);
-						},
-						row));
-				return _elm_lang$core$Native_Utils.eq(cells, 3);
+				var cells = A2(
+					_elm_lang$core$List$filter,
+					function (cell) {
+						return _elm_lang$core$Native_Utils.eq(cell.value, value);
+					},
+					row);
+				return _elm_lang$core$Native_Utils.eq(
+					_elm_lang$core$List$length(cells),
+					3);
 			},
 			board);
 		return _elm_lang$core$Native_Utils.eq(
 			_elm_lang$core$List$length(cols),
-			1) ? value : _elm_lang$core$Native_Utils.chr(' ');
+			1);
+	});
+var _user$project$Main$columnAux = F3(
+	function (board, value, numberCol) {
+		var rows = A2(
+			_elm_lang$core$List$filter,
+			function (row) {
+				var cells = A2(
+					_elm_lang$core$List$filter,
+					function (cell) {
+						return _elm_lang$core$Native_Utils.eq(cell.value, value) && _elm_lang$core$Native_Utils.eq(cell.x, numberCol);
+					},
+					row);
+				return _elm_lang$core$Native_Utils.eq(
+					_elm_lang$core$List$length(cells),
+					1);
+			},
+			board);
+		return _elm_lang$core$Native_Utils.eq(
+			_elm_lang$core$List$length(rows),
+			3);
 	});
 var _user$project$Main$checkColumn = F2(
 	function (board, value) {
-		var rows2 = A2(
-			_elm_lang$core$List$filter,
-			function (list) {
-				return _elm_lang$core$Native_Utils.eq(
-					_elm_lang$core$List$length(
-						A2(
-							_elm_lang$core$List$filter,
-							function (cell) {
-								return _elm_lang$core$Native_Utils.eq(cell.value, value) && _elm_lang$core$Native_Utils.eq(cell.x, 2);
-							},
-							list)),
-					1);
-			},
-			board);
-		var rows1 = A2(
-			_elm_lang$core$List$filter,
-			function (list) {
-				return _elm_lang$core$Native_Utils.eq(
-					_elm_lang$core$List$length(
-						A2(
-							_elm_lang$core$List$filter,
-							function (cell) {
-								return _elm_lang$core$Native_Utils.eq(cell.value, value) && _elm_lang$core$Native_Utils.eq(cell.x, 1);
-							},
-							list)),
-					1);
-			},
-			board);
-		var rows0 = A2(
-			_elm_lang$core$List$filter,
-			function (list) {
-				return _elm_lang$core$Native_Utils.eq(
-					_elm_lang$core$List$length(
-						A2(
-							_elm_lang$core$List$filter,
-							function (cell) {
-								return _elm_lang$core$Native_Utils.eq(cell.value, value) && _elm_lang$core$Native_Utils.eq(cell.x, 0);
-							},
-							list)),
-					1);
-			},
-			board);
-		return (_elm_lang$core$Native_Utils.eq(
-			_elm_lang$core$List$length(rows0),
-			3) || (_elm_lang$core$Native_Utils.eq(
-			_elm_lang$core$List$length(rows1),
-			3) || _elm_lang$core$Native_Utils.eq(
-			_elm_lang$core$List$length(rows2),
-			3))) ? value : _elm_lang$core$Native_Utils.chr(' ');
+		var nrows2 = A3(_user$project$Main$columnAux, board, value, 2);
+		var nrows1 = A3(_user$project$Main$columnAux, board, value, 1);
+		var nrows0 = A3(_user$project$Main$columnAux, board, value, 0);
+		return nrows0 || (nrows1 || nrows2);
 	});
 var _user$project$Main$checkDiagonals = F2(
 	function (board, value) {
 		var diag2 = A2(
 			_elm_lang$core$List$filter,
 			function (row) {
-				var cells = _elm_lang$core$List$length(
-					A2(
-						_elm_lang$core$List$filter,
-						function (cell) {
-							return (_elm_lang$core$Native_Utils.eq(cell.value, value) && (_elm_lang$core$Native_Utils.eq(cell.x, 2) && _elm_lang$core$Native_Utils.eq(cell.y, 0))) || ((_elm_lang$core$Native_Utils.eq(cell.value, value) && (_elm_lang$core$Native_Utils.eq(cell.x, 1) && _elm_lang$core$Native_Utils.eq(cell.y, 1))) || (_elm_lang$core$Native_Utils.eq(cell.value, value) && (_elm_lang$core$Native_Utils.eq(cell.x, 0) && _elm_lang$core$Native_Utils.eq(cell.y, 2))));
-						},
-						row));
-				return _elm_lang$core$Native_Utils.eq(cells, 1);
+				var cells = A2(
+					_elm_lang$core$List$filter,
+					function (cell) {
+						return (_elm_lang$core$Native_Utils.eq(cell.value, value) && (_elm_lang$core$Native_Utils.eq(cell.x, 2) && _elm_lang$core$Native_Utils.eq(cell.y, 0))) || ((_elm_lang$core$Native_Utils.eq(cell.value, value) && (_elm_lang$core$Native_Utils.eq(cell.x, 1) && _elm_lang$core$Native_Utils.eq(cell.y, 1))) || (_elm_lang$core$Native_Utils.eq(cell.value, value) && (_elm_lang$core$Native_Utils.eq(cell.x, 0) && _elm_lang$core$Native_Utils.eq(cell.y, 2))));
+					},
+					row);
+				return _elm_lang$core$Native_Utils.eq(
+					_elm_lang$core$List$length(cells),
+					1);
 			},
 			board);
 		var diag1 = A2(
 			_elm_lang$core$List$filter,
 			function (row) {
-				var cells = _elm_lang$core$List$length(
-					A2(
-						_elm_lang$core$List$filter,
-						function (cell) {
-							return _elm_lang$core$Native_Utils.eq(cell.value, value) && _elm_lang$core$Native_Utils.eq(cell.x, cell.y);
-						},
-						row));
-				return _elm_lang$core$Native_Utils.eq(cells, 1);
+				var cells = A2(
+					_elm_lang$core$List$filter,
+					function (cell) {
+						return _elm_lang$core$Native_Utils.eq(cell.value, value) && _elm_lang$core$Native_Utils.eq(cell.x, cell.y);
+					},
+					row);
+				return _elm_lang$core$Native_Utils.eq(
+					_elm_lang$core$List$length(cells),
+					1);
 			},
 			board);
-		return (_elm_lang$core$Native_Utils.eq(
+		return _elm_lang$core$Native_Utils.eq(
 			_elm_lang$core$List$length(diag1),
 			3) || _elm_lang$core$Native_Utils.eq(
 			_elm_lang$core$List$length(diag2),
-			3)) ? value : _elm_lang$core$Native_Utils.chr(' ');
+			3);
 	});
 var _user$project$Main$checkDraw = function (board) {
 	var rows = A2(
@@ -8086,19 +8064,7 @@ var _user$project$Main$checkForWinner = function (newBoard) {
 		_user$project$Main$checkRow,
 		newBoard,
 		_elm_lang$core$Native_Utils.chr('X'));
-	return ((!_elm_lang$core$Native_Utils.eq(
-		winnerCO,
-		_elm_lang$core$Native_Utils.chr(' '))) || ((!_elm_lang$core$Native_Utils.eq(
-		winnerRO,
-		_elm_lang$core$Native_Utils.chr(' '))) || (!_elm_lang$core$Native_Utils.eq(
-		winnerDO,
-		_elm_lang$core$Native_Utils.chr(' '))))) ? _elm_lang$core$Native_Utils.chr('O') : (((!_elm_lang$core$Native_Utils.eq(
-		winnerCX,
-		_elm_lang$core$Native_Utils.chr(' '))) || ((!_elm_lang$core$Native_Utils.eq(
-		winnerRX,
-		_elm_lang$core$Native_Utils.chr(' '))) || (!_elm_lang$core$Native_Utils.eq(
-		winnerDX,
-		_elm_lang$core$Native_Utils.chr(' '))))) ? _elm_lang$core$Native_Utils.chr('X') : _elm_lang$core$Native_Utils.chr(' '));
+	return (winnerCO || (winnerRO || winnerDO)) ? _elm_lang$core$Native_Utils.chr('O') : ((winnerCX || (winnerRX || winnerDX)) ? _elm_lang$core$Native_Utils.chr('X') : _elm_lang$core$Native_Utils.chr(' '));
 };
 var _user$project$Main$Model = F4(
 	function (a, b, c, d) {
