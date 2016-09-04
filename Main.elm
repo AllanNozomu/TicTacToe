@@ -13,6 +13,7 @@ import String
 type alias Model =
     { board : List (List Tile)
     , turn : Char
+    , winner : Char
     }
 
 
@@ -31,6 +32,7 @@ initModel =
         , [ Tile 0 2 ' ', Tile 1 2 ' ', Tile 2 2 ' ' ]
         ]
     , turn = 'X'
+    , winner = ' '
     }
 
 
@@ -52,19 +54,10 @@ update msg model =
         Place posx posy ->
             let
                 newBoard =
-                    (List.map
-                        (\row ->
-                            List.map
-                                (\cell ->
-                                    if cell.x == posx && cell.y == posy && cell.value == ' ' then
-                                        { cell | value = model.turn }
-                                    else
-                                        cell
-                                )
-                                row
-                        )
+                    if model.winner == ' ' then
+                        updateCell model posx posy
+                    else
                         model.board
-                    )
 
                 newTurn =
                     if newBoard == model.board then
@@ -73,8 +66,149 @@ update msg model =
                         'O'
                     else
                         'X'
+
+                newWinner =
+                    checkForWinner newBoard
             in
-                { model | board = newBoard, turn = newTurn }
+                { model | board = newBoard, turn = newTurn, winner = newWinner }
+
+
+checkForWinner : List (List Tile) -> Char
+checkForWinner newBoard =
+    let
+        winnerRX =
+            checkRow newBoard 'X'
+
+        winnerRO =
+            checkRow newBoard 'O'
+
+        winnerCX =
+            checkColumn newBoard 'X'
+
+        winnerCO =
+            checkColumn newBoard 'O'
+
+        winnerDX =
+            checkDiagonals newBoard 'X'
+
+        winnerDO =
+            checkDiagonals newBoard 'O'
+    in
+        if winnerCO /= ' ' || winnerRO /= ' ' || winnerDO /= ' ' then
+            'O'
+        else if winnerRX /= ' ' || winnerRX /= ' ' || winnerDX /= ' ' then
+            'X'
+        else
+            ' '
+
+
+checkDiagonals : List (List Tile) -> Char -> Char
+checkDiagonals board value =
+    let
+        diag1 =
+            List.filter
+                (\row ->
+                    let
+                        cells =
+                            List.length
+                                (List.filter
+                                    (\cell ->
+                                        (cell.value == value && cell.x == cell.y)
+                                    )
+                                    row
+                                )
+                    in
+                        (cells == 1)
+                )
+                board
+
+        diag2 =
+            List.filter
+                (\row ->
+                    let
+                        cells =
+                            List.length
+                                (List.filter
+                                    (\cell ->
+                                        (cell.value == value && cell.x == 2 && cell.y == 0)
+                                            || (cell.value == value && cell.x == 1 && cell.y == 1)
+                                            || (cell.value == value && cell.x == 0 && cell.y == 2)
+                                    )
+                                    row
+                                )
+                    in
+                        (cells == 1)
+                )
+                board
+    in
+        if List.length diag1 == 3 || List.length diag2 == 3 then
+            value
+        else
+            ' '
+
+
+checkColumn : List (List Tile) -> Char -> Char
+checkColumn board value =
+    let
+        rows =
+            List.filter
+                (\list ->
+                    case List.head list of
+                        Just cell ->
+                            cell.value == value
+
+                        Nothing ->
+                            False
+                )
+                board
+    in
+        if List.length rows == 3 then
+            value
+        else
+            ' '
+
+
+checkRow : List (List Tile) -> Char -> Char
+checkRow board value =
+    let
+        cols =
+            List.filter
+                (\row ->
+                    let
+                        cells =
+                            List.length
+                                (List.filter
+                                    (\cell ->
+                                        cell.value == value
+                                    )
+                                    row
+                                )
+                    in
+                        (cells == 3)
+                )
+                board
+    in
+        if List.length cols == 1 then
+            value
+        else
+            ' '
+
+
+updateCell : Model -> Int -> Int -> List (List Tile)
+updateCell model posx posy =
+    (List.map
+        (\row ->
+            List.map
+                (\cell ->
+                    if cell.x == posx && cell.y == posy && cell.value == ' ' then
+                        { cell | value = model.turn }
+                    else
+                        cell
+                )
+                row
+        )
+        model.board
+    )
 
 
 
@@ -85,8 +219,19 @@ view : Model -> Html Msg
 view model =
     div []
         [ h1 [] [ text "Tic Tac Toe" ]
+        , showWinner model
         , makeBoard model
         , clearButton
+        ]
+
+
+showWinner : Model -> Html Msg
+showWinner model =
+    h1 []
+        [ if model.winner /= ' ' then
+            text ("Winner = " ++ toString (model.winner))
+          else
+            text ""
         ]
 
 

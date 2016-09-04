@@ -7897,9 +7897,152 @@ var _elm_lang$html$Html_Events$Options = F2(
 		return {stopPropagation: a, preventDefault: b};
 	});
 
-var _user$project$Main$Model = F2(
-	function (a, b) {
-		return {board: a, turn: b};
+var _user$project$Main$showWinner = function (model) {
+	return A2(
+		_elm_lang$html$Html$h1,
+		_elm_lang$core$Native_List.fromArray(
+			[]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				(!_elm_lang$core$Native_Utils.eq(
+				model.winner,
+				_elm_lang$core$Native_Utils.chr(' '))) ? _elm_lang$html$Html$text(
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					'Winner = ',
+					_elm_lang$core$Basics$toString(model.winner))) : _elm_lang$html$Html$text('')
+			]));
+};
+var _user$project$Main$updateCell = F3(
+	function (model, posx, posy) {
+		return A2(
+			_elm_lang$core$List$map,
+			function (row) {
+				return A2(
+					_elm_lang$core$List$map,
+					function (cell) {
+						return (_elm_lang$core$Native_Utils.eq(cell.x, posx) && (_elm_lang$core$Native_Utils.eq(cell.y, posy) && _elm_lang$core$Native_Utils.eq(
+							cell.value,
+							_elm_lang$core$Native_Utils.chr(' ')))) ? _elm_lang$core$Native_Utils.update(
+							cell,
+							{value: model.turn}) : cell;
+					},
+					row);
+			},
+			model.board);
+	});
+var _user$project$Main$checkRow = F2(
+	function (board, value) {
+		var cols = A2(
+			_elm_lang$core$List$filter,
+			function (row) {
+				var cells = _elm_lang$core$List$length(
+					A2(
+						_elm_lang$core$List$filter,
+						function (cell) {
+							return _elm_lang$core$Native_Utils.eq(cell.value, value);
+						},
+						row));
+				return _elm_lang$core$Native_Utils.eq(cells, 3);
+			},
+			board);
+		return _elm_lang$core$Native_Utils.eq(
+			_elm_lang$core$List$length(cols),
+			1) ? value : _elm_lang$core$Native_Utils.chr(' ');
+	});
+var _user$project$Main$checkColumn = F2(
+	function (board, value) {
+		var rows = A2(
+			_elm_lang$core$List$filter,
+			function (list) {
+				var _p0 = _elm_lang$core$List$head(list);
+				if (_p0.ctor === 'Just') {
+					return _elm_lang$core$Native_Utils.eq(_p0._0.value, value);
+				} else {
+					return false;
+				}
+			},
+			board);
+		return _elm_lang$core$Native_Utils.eq(
+			_elm_lang$core$List$length(rows),
+			3) ? value : _elm_lang$core$Native_Utils.chr(' ');
+	});
+var _user$project$Main$checkDiagonals = F2(
+	function (board, value) {
+		var diag2 = A2(
+			_elm_lang$core$List$filter,
+			function (row) {
+				var cells = _elm_lang$core$List$length(
+					A2(
+						_elm_lang$core$List$filter,
+						function (cell) {
+							return (_elm_lang$core$Native_Utils.eq(cell.value, value) && (_elm_lang$core$Native_Utils.eq(cell.x, 2) && _elm_lang$core$Native_Utils.eq(cell.y, 0))) || ((_elm_lang$core$Native_Utils.eq(cell.value, value) && (_elm_lang$core$Native_Utils.eq(cell.x, 1) && _elm_lang$core$Native_Utils.eq(cell.y, 1))) || (_elm_lang$core$Native_Utils.eq(cell.value, value) && (_elm_lang$core$Native_Utils.eq(cell.x, 0) && _elm_lang$core$Native_Utils.eq(cell.y, 2))));
+						},
+						row));
+				return _elm_lang$core$Native_Utils.eq(cells, 1);
+			},
+			board);
+		var diag1 = A2(
+			_elm_lang$core$List$filter,
+			function (row) {
+				var cells = _elm_lang$core$List$length(
+					A2(
+						_elm_lang$core$List$filter,
+						function (cell) {
+							return _elm_lang$core$Native_Utils.eq(cell.value, value) && _elm_lang$core$Native_Utils.eq(cell.x, cell.y);
+						},
+						row));
+				return _elm_lang$core$Native_Utils.eq(cells, 1);
+			},
+			board);
+		return (_elm_lang$core$Native_Utils.eq(
+			_elm_lang$core$List$length(diag1),
+			3) || _elm_lang$core$Native_Utils.eq(
+			_elm_lang$core$List$length(diag2),
+			3)) ? value : _elm_lang$core$Native_Utils.chr(' ');
+	});
+var _user$project$Main$checkForWinner = function (newBoard) {
+	var winnerDO = A2(
+		_user$project$Main$checkDiagonals,
+		newBoard,
+		_elm_lang$core$Native_Utils.chr('O'));
+	var winnerDX = A2(
+		_user$project$Main$checkDiagonals,
+		newBoard,
+		_elm_lang$core$Native_Utils.chr('X'));
+	var winnerCO = A2(
+		_user$project$Main$checkColumn,
+		newBoard,
+		_elm_lang$core$Native_Utils.chr('O'));
+	var winnerCX = A2(
+		_user$project$Main$checkColumn,
+		newBoard,
+		_elm_lang$core$Native_Utils.chr('X'));
+	var winnerRO = A2(
+		_user$project$Main$checkRow,
+		newBoard,
+		_elm_lang$core$Native_Utils.chr('O'));
+	var winnerRX = A2(
+		_user$project$Main$checkRow,
+		newBoard,
+		_elm_lang$core$Native_Utils.chr('X'));
+	return ((!_elm_lang$core$Native_Utils.eq(
+		winnerCO,
+		_elm_lang$core$Native_Utils.chr(' '))) || ((!_elm_lang$core$Native_Utils.eq(
+		winnerRO,
+		_elm_lang$core$Native_Utils.chr(' '))) || (!_elm_lang$core$Native_Utils.eq(
+		winnerDO,
+		_elm_lang$core$Native_Utils.chr(' '))))) ? _elm_lang$core$Native_Utils.chr('O') : (((!_elm_lang$core$Native_Utils.eq(
+		winnerRX,
+		_elm_lang$core$Native_Utils.chr(' '))) || ((!_elm_lang$core$Native_Utils.eq(
+		winnerRX,
+		_elm_lang$core$Native_Utils.chr(' '))) || (!_elm_lang$core$Native_Utils.eq(
+		winnerDX,
+		_elm_lang$core$Native_Utils.chr(' '))))) ? _elm_lang$core$Native_Utils.chr('X') : _elm_lang$core$Native_Utils.chr(' '));
+};
+var _user$project$Main$Model = F3(
+	function (a, b, c) {
+		return {board: a, turn: b, winner: c};
 	});
 var _user$project$Main$Tile = F3(
 	function (a, b, c) {
@@ -7963,35 +8106,25 @@ var _user$project$Main$initModel = {
 				_elm_lang$core$Native_Utils.chr(' '))
 			])
 		]),
-	turn: _elm_lang$core$Native_Utils.chr('X')
+	turn: _elm_lang$core$Native_Utils.chr('X'),
+	winner: _elm_lang$core$Native_Utils.chr(' ')
 };
 var _user$project$Main$update = F2(
 	function (msg, model) {
-		var _p0 = msg;
-		if (_p0.ctor === 'Clear') {
+		var _p1 = msg;
+		if (_p1.ctor === 'Clear') {
 			return _user$project$Main$initModel;
 		} else {
-			var newBoard = A2(
-				_elm_lang$core$List$map,
-				function (row) {
-					return A2(
-						_elm_lang$core$List$map,
-						function (cell) {
-							return (_elm_lang$core$Native_Utils.eq(cell.x, _p0._0) && (_elm_lang$core$Native_Utils.eq(cell.y, _p0._1) && _elm_lang$core$Native_Utils.eq(
-								cell.value,
-								_elm_lang$core$Native_Utils.chr(' ')))) ? _elm_lang$core$Native_Utils.update(
-								cell,
-								{value: model.turn}) : cell;
-						},
-						row);
-				},
-				model.board);
+			var newBoard = _elm_lang$core$Native_Utils.eq(
+				model.winner,
+				_elm_lang$core$Native_Utils.chr(' ')) ? A3(_user$project$Main$updateCell, model, _p1._0, _p1._1) : model.board;
 			var newTurn = _elm_lang$core$Native_Utils.eq(newBoard, model.board) ? model.turn : (_elm_lang$core$Native_Utils.eq(
 				model.turn,
 				_elm_lang$core$Native_Utils.chr('X')) ? _elm_lang$core$Native_Utils.chr('O') : _elm_lang$core$Native_Utils.chr('X'));
+			var newWinner = _user$project$Main$checkForWinner(newBoard);
 			return _elm_lang$core$Native_Utils.update(
 				model,
-				{board: newBoard, turn: newTurn});
+				{board: newBoard, turn: newTurn, winner: newWinner});
 		}
 	});
 var _user$project$Main$Place = F2(
@@ -8065,6 +8198,7 @@ var _user$project$Main$view = function (model) {
 					[
 						_elm_lang$html$Html$text('Tic Tac Toe')
 					])),
+				_user$project$Main$showWinner(model),
 				_user$project$Main$makeBoard(model),
 				_user$project$Main$clearButton
 			]));
