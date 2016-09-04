@@ -11,7 +11,7 @@ var _user$project$Main$showWinner = function (model) {
 				A2(
 					_elm_lang$core$Basics_ops['++'],
 					'Winner = ',
-					_elm_lang$core$Basics$toString(model.winner))) : _elm_lang$html$Html$text('')
+					_elm_lang$core$Basics$toString(model.winner))) : _elm_lang$html$Html$text('-')
 			]));
 };
 var _user$project$Main$updateCell = F3(

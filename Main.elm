@@ -231,7 +231,7 @@ showWinner model =
         [ if model.winner /= ' ' then
             text ("Winner = " ++ toString (model.winner))
           else
-            text ""
+            text "-"
         ]
 
 
