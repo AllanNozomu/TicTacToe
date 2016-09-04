@@ -96,7 +96,7 @@ checkForWinner newBoard =
     in
         if winnerCO /= ' ' || winnerRO /= ' ' || winnerDO /= ' ' then
             'O'
-        else if winnerRX /= ' ' || winnerRX /= ' ' || winnerDX /= ' ' then
+        else if winnerCX /= ' ' || winnerRX /= ' ' || winnerDX /= ' ' then
             'X'
         else
             ' '
@@ -150,19 +150,50 @@ checkDiagonals board value =
 checkColumn : List (List Tile) -> Char -> Char
 checkColumn board value =
     let
-        rows =
+        rows0 =
             List.filter
                 (\list ->
-                    case List.head list of
-                        Just cell ->
-                            cell.value == value
+                    ((List.filter
+                        (\cell ->
+                            cell.value == value && cell.x == 0
+                        )
+                        list
+                     )
+                        |> List.length
+                    )
+                        == 1
+                )
+                board
 
-                        Nothing ->
-                            False
+        rows1 =
+            List.filter
+                (\list ->
+                    List.length
+                        (List.filter
+                            (\cell ->
+                                cell.value == value && cell.x == 1
+                            )
+                            list
+                        )
+                        == 1
+                )
+                board
+
+        rows2 =
+            List.filter
+                (\list ->
+                    List.length
+                        (List.filter
+                            (\cell ->
+                                cell.value == value && cell.x == 2
+                            )
+                            list
+                        )
+                        == 1
                 )
                 board
     in
-        if List.length rows == 3 then
+        if List.length rows0 == 3 || List.length rows1 == 3 || List.length rows2 == 3 then
             value
         else
             ' '
