@@ -3,4 +3,4 @@ TicTacToe game using Elm
 
 Simple TicTacToe game using Elm to practice the language use. 
 
-To run it, I used Gulp. You can test it donwloading and running index.html.
+It was my first little project using Elm. Please, if you have any question, suggestions or even a issue, you can contact me ;D
