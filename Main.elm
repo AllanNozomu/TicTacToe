@@ -3,7 +3,6 @@ module Main exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import Html.App as App
 import String
 
 
@@ -11,31 +10,26 @@ import String
 
 
 type alias Model =
-    { board : List (List Tile)
+    { board : List (List Char)
     , turn : Char
-    , winner : Char
+    , winner : Bool
     , draw : Bool
     }
 
 
-type alias Tile =
-    { x : Int
-    , y : Int
-    , value : Char
-    }
-
-
-initModel : Model
+initModel : ( Model, Cmd msg )
 initModel =
-    { board =
-        [ [ Tile 0 0 ' ', Tile 1 0 ' ', Tile 2 0 ' ' ]
-        , [ Tile 0 1 ' ', Tile 1 1 ' ', Tile 2 1 ' ' ]
-        , [ Tile 0 2 ' ', Tile 1 2 ' ', Tile 2 2 ' ' ]
-        ]
-    , turn = 'X'
-    , winner = ' '
-    , draw = False
-    }
+    ( { board =
+            [ [ ' ', ' ', ' ' ]
+            , [ ' ', ' ', ' ' ]
+            , [ ' ', ' ', ' ' ]
+            ]
+      , turn = 'X'
+      , winner = False
+      , draw = False
+      }
+    , Cmd.none
+    )
 
 
 
@@ -47,191 +41,132 @@ type Msg
     | Place Int Int
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> ( Model, Cmd msg )
 update msg model =
     case msg of
         Clear ->
             initModel
 
         Place posx posy ->
-            let
-                newBoard =
-                    if model.winner == ' ' then
+            if model.winner then
+                model ! []
+            else
+                let
+                    newBoard =
                         updateCell model posx posy
-                    else
-                        model.board
 
-                newTurn =
-                    if newBoard == model.board then
-                        model.turn
-                    else if model.turn == 'X' then
-                        'O'
-                    else
-                        'X'
+                    newWinner =
+                        checkForWinner newBoard
 
-                newWinner =
-                    checkForWinner newBoard
+                    isDraw =
+                        if newWinner then
+                            False
+                        else
+                            checkDraw newBoard
 
-                isDraw =
-                    checkDraw newBoard
-            in
-                { model | board = newBoard, turn = newTurn, winner = newWinner, draw = isDraw }
-
-
-checkForWinner : List (List Tile) -> Char
-checkForWinner newBoard =
-    let
-        winnerRX =
-            checkRow newBoard 'X'
-
-        winnerRO =
-            checkRow newBoard 'O'
-
-        winnerCX =
-            checkColumn newBoard 'X'
-
-        winnerCO =
-            checkColumn newBoard 'O'
-
-        winnerDX =
-            checkDiagonals newBoard 'X'
-
-        winnerDO =
-            checkDiagonals newBoard 'O'
-    in
-        if winnerCO || winnerRO || winnerDO then
-            'O'
-        else if winnerCX || winnerRX || winnerDX then
-            'X'
-        else
-            ' '
+                    newTurn =
+                        if newWinner then
+                            model.turn
+                        else if model.turn == 'X' then
+                            'O'
+                        else
+                            'X'
+                in
+                    { model | board = newBoard, turn = newTurn, winner = newWinner, draw = isDraw } ! []
 
 
-checkDraw : List (List Tile) -> Bool
+checkForWinner : List (List Char) -> Bool
+checkForWinner board =
+    (checkRow board || checkColumn board || checkDiagonals board)
+
+
+checkDraw : List (List Char) -> Bool
 checkDraw board =
+    not <| List.member ' ' (List.foldr List.append [] board)
+
+
+allEqual : List Char -> Bool
+allEqual list =
+    case List.head list of
+        Just ' ' ->
+            False
+
+        Just value ->
+            List.foldr
+                (\element status ->
+                    if status then
+                        element == value
+                    else
+                        False
+                )
+                True
+                list
+
+        Nothing ->
+            False
+
+
+takeElement : Int -> List a -> List a
+takeElement index list =
+    List.take 1 <| List.drop index list
+
+
+checkDiagonals : List (List Char) -> Bool
+checkDiagonals board =
     let
-        rows =
-            List.filter
-                (\row ->
-                    (List.filter
-                        (\cell ->
-                            cell.value /= ' '
-                        )
-                        row
-                        |> List.length
+        diagonal1 =
+            List.concat <|
+                List.indexedMap
+                    (\index row ->
+                        takeElement index row
                     )
-                        == 3
-                )
-                board
+                <|
+                    board
+
+        diagonal2 =
+            List.concat <|
+                List.indexedMap
+                    (\index row ->
+                        takeElement (2 - index) row
+                    )
+                <|
+                    board
     in
-        List.length rows == 3
+        (allEqual diagonal1 || allEqual diagonal2)
 
 
-checkDiagonals : List (List Tile) -> Char -> Bool
-checkDiagonals board value =
-    let
-        diag1 =
-            List.filter
-                (\row ->
-                    let
-                        cells =
-                            List.filter
-                                (\cell ->
-                                    (cell.value == value && cell.x == cell.y)
-                                )
-                                row
-                    in
-                        List.length cells == 1
-                )
-                board
-
-        diag2 =
-            List.filter
-                (\row ->
-                    let
-                        cells =
-                            (List.filter
-                                (\cell ->
-                                    (cell.value == value && cell.x == 2 && cell.y == 0)
-                                        || (cell.value == value && cell.x == 1 && cell.y == 1)
-                                        || (cell.value == value && cell.x == 0 && cell.y == 2)
-                                )
-                                row
-                            )
-                    in
-                        List.length cells == 1
-                )
-                board
-    in
-        List.length diag1 == 3 || List.length diag2 == 3
+checkColumn : List (List Char) -> Bool
+checkColumn board =
+    List.length (List.filter (\status -> status) <| List.map allEqual board) > 0
 
 
-columnAux : List (List Tile) -> Char -> Int -> Bool
-columnAux board value numberCol =
+checkRow : List (List Char) -> Bool
+checkRow board =
     let
         rows =
-            List.filter
-                (\row ->
-                    let
-                        cells =
-                            (List.filter
-                                (\cell ->
-                                    cell.value == value && cell.x == numberCol
-                                )
-                                row
+            List.indexedMap
+                (\index _ ->
+                    List.concat <|
+                        List.map
+                            (\row ->
+                                takeElement index row
                             )
-                    in
-                        List.length cells == 1
+                            board
                 )
-                board
+            <|
+                List.range 0 2
     in
-        List.length rows == 3
+        List.length (List.filter (\status -> status) <| List.map allEqual rows) > 0
 
 
-checkColumn : List (List Tile) -> Char -> Bool
-checkColumn board value =
-    let
-        nrows0 =
-            columnAux board value 0
-
-        nrows1 =
-            columnAux board value 1
-
-        nrows2 =
-            columnAux board value 2
-    in
-        nrows0 || nrows1 || nrows2
-
-
-checkRow : List (List Tile) -> Char -> Bool
-checkRow board value =
-    let
-        cols =
-            List.filter
-                (\row ->
-                    let
-                        cells =
-                            List.filter
-                                (\cell ->
-                                    cell.value == value
-                                )
-                                row
-                    in
-                        List.length cells == 3
-                )
-                board
-    in
-        List.length cols == 1
-
-
-updateCell : Model -> Int -> Int -> List (List Tile)
+updateCell : Model -> Int -> Int -> List (List Char)
 updateCell model posx posy =
-    (List.map
-        (\row ->
-            List.map
-                (\cell ->
-                    if cell.x == posx && cell.y == posy && cell.value == ' ' then
-                        { cell | value = model.turn }
+    (List.indexedMap
+        (\y row ->
+            List.indexedMap
+                (\x cell ->
+                    if x == posx && y == posy && cell == ' ' then
+                        model.turn
                     else
                         cell
                 )
@@ -258,8 +193,8 @@ view model =
 showWinner : Model -> Html Msg
 showWinner model =
     h1 []
-        [ if model.winner /= ' ' then
-            text ("Winner = " ++ (String.fromChar model.winner))
+        [ if model.winner then
+            text ("Winner = " ++ (String.fromChar model.turn))
           else if model.draw then
             text "DRAW!"
           else
@@ -269,41 +204,42 @@ showWinner model =
 
 clearButton : Html Msg
 clearButton =
-    button [ type' "button", onClick Clear ] [ text "Restart" ]
+    button [ type_ "button", onClick Clear ] [ text "Restart" ]
 
 
 makeBoard : Model -> Html Msg
 makeBoard model =
     div [ class "board" ]
         [ ul []
-            (List.map
-                (\boardRow ->
-                    makeBoardCells boardRow
+            (List.indexedMap
+                (\rowIndex boardRow ->
+                    makeBoardCells rowIndex boardRow
                 )
                 model.board
             )
         ]
 
 
-makeBoardCells : List Tile -> Html Msg
-makeBoardCells boardRow =
+makeBoardCells : Int -> List Char -> Html Msg
+makeBoardCells y boardRow =
     li []
-        (List.map
-            (\cell ->
+        (List.indexedMap
+            (\x cell ->
                 div
-                    [ class "button", onClick (Place cell.x cell.y) ]
+                    [ class "button", onClick (Place x y) ]
                     [ text
-                        (String.fromChar cell.value)
+                        (String.fromChar cell)
                     ]
             )
             boardRow
         )
 
 
-main : Program Never
+main : Program Never Model Msg
 main =
-    App.beginnerProgram
-        { model = initModel
+    Html.program
+        { init = initModel
         , view = view
         , update = update
+        , subscriptions = \_ -> Sub.none
         }
