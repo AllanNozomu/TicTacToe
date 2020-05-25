@@ -1,19 +1,21 @@
-<!doctype html>
+<!DOCTYPE HTML>
 <html lang="en">
 
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tic Tac Toe</title>
-   <link href="https://fonts.googleapis.com/css?family=Baloo+Tamma" rel="stylesheet"> 
+  <link href="https://fonts.googleapis.com/css?family=Baloo+Tamma" rel="stylesheet">
   <link rel="stylesheet" href="tictactoe.css">
+  <script src="bundle.js"></script>
 </head>
 
 <body>
-  <div id="app"></div>
-  <script src="bundle.js"></script>
+  <div id="elm-node"></div>
   <script>
-    var app = Elm.Main.embed(document.getElementById("app"));
+    var app = Elm.Main.init({
+      node: document.getElementById("elm-node")
+    })
   </script>
 </body>
 

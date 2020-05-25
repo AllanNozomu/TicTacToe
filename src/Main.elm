@@ -1,13 +1,12 @@
 module Main exposing (..)
 
+import Browser
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import String
 
-
 --Models
-
 
 type alias Model =
     { board : List (List Char)
@@ -15,7 +14,6 @@ type alias Model =
     , winner : Bool
     , draw : Bool
     }
-
 
 initModel : ( Model, Cmd msg )
 initModel =
@@ -32,24 +30,21 @@ initModel =
     )
 
 
-
 --Update
-
 
 type Msg
     = Clear
     | Place Int Int
 
-
-update : Msg -> Model -> ( Model, Cmd msg )
-update msg model =
+update : Msg -> ( Model, Cmd msg ) -> ( Model, Cmd msg )
+update msg (model, cmd) =
     case msg of
         Clear ->
             initModel
 
         Place posx posy ->
             if model.winner then
-                model ! []
+                (model, Cmd.none)
             else
                 let
                     newBoard =
@@ -72,7 +67,7 @@ update msg model =
                         else
                             'X'
                 in
-                    { model | board = newBoard, turn = newTurn, winner = newWinner, draw = isDraw } ! []
+                    ({ model | board = newBoard, turn = newTurn, winner = newWinner, draw = isDraw }, Cmd.none)
 
 
 checkForWinner : List (List Char) -> Bool
@@ -158,7 +153,6 @@ checkRow board =
     in
         List.length (List.filter (\status -> status) <| List.map allEqual rows) > 0
 
-
 updateCell : Model -> Int -> Int -> List (List Char)
 updateCell model posx posy =
     (List.indexedMap
@@ -175,20 +169,16 @@ updateCell model posx posy =
         model.board
     )
 
-
-
 --View
 
-
-view : Model -> Html Msg
-view model =
+view : ( Model, Cmd msg ) -> Html Msg
+view (model, cmd) =
     div []
         [ h1 [ class "titulo" ] [ text "Tic Tac Toe" ]
         , showWinner model
         , makeBoard model
         , clearButton
         ]
-
 
 showWinner : Model -> Html Msg
 showWinner model =
@@ -201,11 +191,9 @@ showWinner model =
             text (String.fromChar model.turn ++ "'s Turn")
         ]
 
-
 clearButton : Html Msg
 clearButton =
     button [ type_ "button", onClick Clear ] [ text "Restart" ]
-
 
 makeBoard : Model -> Html Msg
 makeBoard model =
@@ -218,7 +206,6 @@ makeBoard model =
                 model.board
             )
         ]
-
 
 makeBoardCells : Int -> List Char -> Html Msg
 makeBoardCells y boardRow =
@@ -234,12 +221,4 @@ makeBoardCells y boardRow =
             boardRow
         )
 
-
-main : Program Never Model Msg
-main =
-    Html.program
-        { init = initModel
-        , view = view
-        , update = update
-        , subscriptions = \_ -> Sub.none
-        }
+main = Browser.sandbox { init = initModel, update = update, view = view }
