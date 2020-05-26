@@ -4855,6 +4855,42 @@ var $author$project$Main$initModel = _Utils_Tuple2(
 					_Utils_chr(' ')
 				])
 			]),
+		columns: _List_fromArray(
+			[
+				_List_fromArray(
+				[
+					_Utils_chr(' '),
+					_Utils_chr(' '),
+					_Utils_chr(' ')
+				]),
+				_List_fromArray(
+				[
+					_Utils_chr(' '),
+					_Utils_chr(' '),
+					_Utils_chr(' ')
+				]),
+				_List_fromArray(
+				[
+					_Utils_chr(' '),
+					_Utils_chr(' '),
+					_Utils_chr(' ')
+				])
+			]),
+		diagonals: _List_fromArray(
+			[
+				_List_fromArray(
+				[
+					_Utils_chr(' '),
+					_Utils_chr(' '),
+					_Utils_chr(' ')
+				]),
+				_List_fromArray(
+				[
+					_Utils_chr(' '),
+					_Utils_chr(' '),
+					_Utils_chr(' ')
+				])
+			]),
 		draw: false,
 		turn: _Utils_chr('X'),
 		winner: false
@@ -5201,6 +5237,9 @@ var $elm$core$List$append = F2(
 			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
 		}
 	});
+var $elm$core$List$concat = function (lists) {
+	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
+};
 var $elm$core$List$any = F2(
 	function (isOkay, list) {
 		any:
@@ -5236,59 +5275,7 @@ var $author$project$Main$checkDraw = function (board) {
 	return !A2(
 		$elm$core$List$member,
 		_Utils_chr(' '),
-		A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, board));
-};
-var $elm$core$List$head = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return $elm$core$Maybe$Just(x);
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
-var $author$project$Main$allEqual = function (list) {
-	var _v0 = $elm$core$List$head(list);
-	if (_v0.$ === 'Just') {
-		if (' ' === _v0.a.valueOf()) {
-			return false;
-		} else {
-			var value = _v0.a;
-			return A3(
-				$elm$core$List$foldr,
-				F2(
-					function (element, status) {
-						return status ? _Utils_eq(element, value) : false;
-					}),
-				true,
-				list);
-		}
-	} else {
-		return false;
-	}
-};
-var $elm$core$List$filter = F2(
-	function (isGood, list) {
-		return A3(
-			$elm$core$List$foldr,
-			F2(
-				function (x, xs) {
-					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
-				}),
-			_List_Nil,
-			list);
-	});
-var $author$project$Main$checkColumn = function (board) {
-	return $elm$core$List$length(
-		A2(
-			$elm$core$List$filter,
-			function (status) {
-				return status;
-			},
-			A2($elm$core$List$map, $author$project$Main$allEqual, board))) > 0;
-};
-var $elm$core$List$concat = function (lists) {
-	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
+		$elm$core$List$concat(board));
 };
 var $elm$core$List$drop = F2(
 	function (n, list) {
@@ -5311,179 +5298,96 @@ var $elm$core$List$drop = F2(
 			}
 		}
 	});
-var $elm$core$List$takeReverse = F3(
-	function (n, list, kept) {
-		takeReverse:
-		while (true) {
-			if (n <= 0) {
-				return kept;
-			} else {
-				if (!list.b) {
-					return kept;
-				} else {
-					var x = list.a;
-					var xs = list.b;
-					var $temp$n = n - 1,
-						$temp$list = xs,
-						$temp$kept = A2($elm$core$List$cons, x, kept);
-					n = $temp$n;
-					list = $temp$list;
-					kept = $temp$kept;
-					continue takeReverse;
-				}
-			}
-		}
-	});
-var $elm$core$List$takeTailRec = F2(
-	function (n, list) {
-		return $elm$core$List$reverse(
-			A3($elm$core$List$takeReverse, n, list, _List_Nil));
-	});
-var $elm$core$List$takeFast = F3(
-	function (ctr, n, list) {
-		if (n <= 0) {
-			return _List_Nil;
-		} else {
-			var _v0 = _Utils_Tuple2(n, list);
-			_v0$1:
-			while (true) {
-				_v0$5:
-				while (true) {
-					if (!_v0.b.b) {
-						return list;
-					} else {
-						if (_v0.b.b.b) {
-							switch (_v0.a) {
-								case 1:
-									break _v0$1;
-								case 2:
-									var _v2 = _v0.b;
-									var x = _v2.a;
-									var _v3 = _v2.b;
-									var y = _v3.a;
-									return _List_fromArray(
-										[x, y]);
-								case 3:
-									if (_v0.b.b.b.b) {
-										var _v4 = _v0.b;
-										var x = _v4.a;
-										var _v5 = _v4.b;
-										var y = _v5.a;
-										var _v6 = _v5.b;
-										var z = _v6.a;
-										return _List_fromArray(
-											[x, y, z]);
-									} else {
-										break _v0$5;
-									}
-								default:
-									if (_v0.b.b.b.b && _v0.b.b.b.b.b) {
-										var _v7 = _v0.b;
-										var x = _v7.a;
-										var _v8 = _v7.b;
-										var y = _v8.a;
-										var _v9 = _v8.b;
-										var z = _v9.a;
-										var _v10 = _v9.b;
-										var w = _v10.a;
-										var tl = _v10.b;
-										return (ctr > 1000) ? A2(
-											$elm$core$List$cons,
-											x,
-											A2(
-												$elm$core$List$cons,
-												y,
-												A2(
-													$elm$core$List$cons,
-													z,
-													A2(
-														$elm$core$List$cons,
-														w,
-														A2($elm$core$List$takeTailRec, n - 4, tl))))) : A2(
-											$elm$core$List$cons,
-											x,
-											A2(
-												$elm$core$List$cons,
-												y,
-												A2(
-													$elm$core$List$cons,
-													z,
-													A2(
-														$elm$core$List$cons,
-														w,
-														A3($elm$core$List$takeFast, ctr + 1, n - 4, tl)))));
-									} else {
-										break _v0$5;
-									}
-							}
-						} else {
-							if (_v0.a === 1) {
-								break _v0$1;
-							} else {
-								break _v0$5;
-							}
-						}
-					}
-				}
-				return list;
-			}
-			var _v1 = _v0.b;
-			var x = _v1.a;
-			return _List_fromArray(
-				[x]);
-		}
-	});
-var $elm$core$List$take = F2(
-	function (n, list) {
-		return A3($elm$core$List$takeFast, 0, n, list);
-	});
-var $author$project$Main$takeElement = F2(
-	function (index, list) {
-		return A2(
-			$elm$core$List$take,
-			1,
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $author$project$Main$takeElement = F3(
+	function (index, list, _default) {
+		var _v0 = $elm$core$List$head(
 			A2($elm$core$List$drop, index, list));
+		if (_v0.$ === 'Just') {
+			var l = _v0.a;
+			return l;
+		} else {
+			return _default;
+		}
 	});
+var $author$project$Main$allEqual = function (list) {
+	var value = A3(
+		$author$project$Main$takeElement,
+		0,
+		list,
+		_Utils_chr(' '));
+	return A3(
+		$elm$core$List$foldr,
+		F2(
+			function (element, status) {
+				return (status && (!_Utils_eq(
+					element,
+					_Utils_chr(' ')))) ? _Utils_eq(element, value) : false;
+			}),
+		true,
+		list);
+};
+var $author$project$Main$checkColumn = function (board) {
+	return A3(
+		$elm$core$List$foldr,
+		$elm$core$Basics$or,
+		false,
+		A2($elm$core$List$map, $author$project$Main$allEqual, board));
+};
 var $author$project$Main$checkDiagonals = function (board) {
-	var diagonal2 = $elm$core$List$concat(
-		A2(
-			$elm$core$List$indexedMap,
-			F2(
-				function (index, row) {
-					return A2($author$project$Main$takeElement, 2 - index, row);
-				}),
-			board));
-	var diagonal1 = $elm$core$List$concat(
-		A2(
-			$elm$core$List$indexedMap,
-			F2(
-				function (index, row) {
-					return A2($author$project$Main$takeElement, index, row);
-				}),
-			board));
+	var diagonal2 = A2(
+		$elm$core$List$indexedMap,
+		F2(
+			function (index, row) {
+				return A3(
+					$author$project$Main$takeElement,
+					2 - index,
+					row,
+					_Utils_chr(' '));
+			}),
+		board);
+	var diagonal1 = A2(
+		$elm$core$List$indexedMap,
+		F2(
+			function (index, row) {
+				return A3(
+					$author$project$Main$takeElement,
+					index,
+					row,
+					_Utils_chr(' '));
+			}),
+		board);
 	return $author$project$Main$allEqual(diagonal1) || $author$project$Main$allEqual(diagonal2);
 };
 var $author$project$Main$checkRow = function (board) {
-	var rows = A2(
-		$elm$core$List$indexedMap,
-		F2(
-			function (index, _v0) {
-				return $elm$core$List$concat(
-					A2(
-						$elm$core$List$map,
-						function (row) {
-							return A2($author$project$Main$takeElement, index, row);
-						},
-						board));
-			}),
-		A2($elm$core$List$range, 0, 2));
-	return $elm$core$List$length(
+	var rowsRes = A2(
+		$elm$core$List$map,
+		function (col) {
+			return $author$project$Main$allEqual(
+				A2(
+					$elm$core$List$map,
+					function (row) {
+						return A3(
+							$author$project$Main$takeElement,
+							col,
+							row,
+							_Utils_chr(' '));
+					},
+					board));
+		},
 		A2(
-			$elm$core$List$filter,
-			function (status) {
-				return status;
-			},
-			A2($elm$core$List$map, $author$project$Main$allEqual, rows))) > 0;
+			$elm$core$List$range,
+			0,
+			$elm$core$List$length(board)));
+	return A3($elm$core$List$foldr, $elm$core$Basics$or, false, rowsRes);
 };
 var $author$project$Main$checkForWinner = function (board) {
 	return $author$project$Main$checkRow(board) || ($author$project$Main$checkColumn(board) || $author$project$Main$checkDiagonals(board));
@@ -5599,8 +5503,17 @@ var $author$project$Main$makeBoardCells = F2(
 							_List_fromArray(
 								[
 									$elm$html$Html$Attributes$class('button'),
-									$elm$html$Html$Events$onClick(
-									A2($author$project$Main$Place, x, y))
+									function () {
+									switch (cell.valueOf()) {
+										case 'X':
+											return $elm$html$Html$Attributes$class('red');
+										case 'O':
+											return $elm$html$Html$Attributes$class('blue');
+										default:
+											return $elm$html$Html$Events$onClick(
+												A2($author$project$Main$Place, x, y));
+									}
+								}()
 								]),
 							_List_fromArray(
 								[
