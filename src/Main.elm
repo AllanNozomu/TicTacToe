@@ -248,7 +248,12 @@ makeBoardCells y boardRow =
         (List.indexedMap
             (\x cell ->
                 div
-                    [ class "button", onClick (Place x y) ]
+                    [ class "button",
+                    case cell of 
+                        'X' -> class "red"
+                        'O' -> class "blue"
+                        _ -> onClick (Place x y)
+                    ]
                     [ text
                         (String.fromChar cell)
                     ]
