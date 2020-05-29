@@ -54,7 +54,7 @@ update msg ( model, cmd ) =
             else
                 let
                     newBoard =
-                        updateCell model posx posy
+                        updateCell model.board model.turn posx posy
 
                     newWinner =
                         checkForWinner newBoard
@@ -98,51 +98,36 @@ checkDraw board =
 checkDiagonals : Array (Array Char) -> Bool
 checkDiagonals board =
     let
-        spaceEqualNothing : Maybe Char -> Char
-        spaceEqualNothing a =
-            case a of
-                Just b -> b
-                Nothing -> ' '
-
         diagonal1 =
             board |> Array.indexedMap
                 (\index row ->
-                    Array.get index row |> spaceEqualNothing
+                    Array.get index row |> Maybe.withDefault ' '
                 )
                 
-
         diagonal2 =
             board |> Array.indexedMap
                 (\index row ->
-                    Array.get (Array.length board - index - 1) row |> spaceEqualNothing
+                    Array.get (Array.length board - index - 1) row |> Maybe.withDefault ' '
                 )
-                
     in
     allEquals diagonal1 || allEquals diagonal2
 
 
 checkRow : Array (Array Char) -> Bool
 checkRow board =
-    board |> Array.map
-        (\line ->
-            allEquals line
-        ) |> Array.foldr (||) False
+    board 
+        |> Array.map (\line -> allEquals line ) 
+        |> Array.foldr (||) False
 
 checkColumn : Array (Array Char) -> Bool
 checkColumn board =
-    let
-        newLine = 
-            case Array.get 0 board of
-            Just a -> a
-            Nothing -> Array.empty
-    in
-    newLine |> Array.indexedMap (\index _ ->
-        Array.map (\row ->
-            case Array.get index row of
-                Just l -> l
-                _ -> ' '
-        ) board |> allEquals
-    ) |> Array.foldr (||) False
+    Array.get 0 board
+        |> Maybe.withDefault Array.empty 
+        |> Array.indexedMap (\index _ ->
+                Array.map (\row -> Array.get index row |> Maybe.withDefault ' '
+            ) board 
+            |> allEquals ) 
+        |> Array.foldr (||) False
 
 allEquals : Array Char -> Bool
 allEquals a =
@@ -154,21 +139,14 @@ allEquals a =
     Nothing -> False
 
 
-updateCell : Model -> Int -> Int -> Array (Array Char)
-updateCell model posy posx =
-    let
-        board =
-            model.board
-
-        turn =
-            model.turn
-    in
+updateCell : Array(Array Char) -> Char -> Int -> Int -> Array (Array Char)
+updateCell board turn posy posx =
     case Array.get posx board of
         Just line ->
             Array.set posx (Array.set posy turn line) board
 
         Nothing ->
-            model.board
+            board
 
 
 
@@ -179,23 +157,23 @@ view : ( Model, Cmd msg ) -> Html Msg
 view ( model, cmd ) =
     div []
         [ h1 [ class "titulo" ] [ text "Tic Tac Toe" ]
-        , showWinner model
-        , makeBoard model
+        , showHeader model.winner model.draw model.turn
+        , makeBoard model.board
         , clearButton
         ]
 
 
-showWinner : Model -> Html Msg
-showWinner model =
+showHeader : Bool -> Bool -> Char -> Html Msg
+showHeader winner draw turn =
     h1 []
-        [ if model.winner then
-            text ("Winner = " ++ String.fromChar model.turn)
+        [ if winner then
+            text ("Winner = " ++ String.fromChar turn)
 
-          else if model.draw then
+          else if draw then
             text "DRAW!"
 
           else
-            text (String.fromChar model.turn ++ "'s Turn")
+            text (String.fromChar turn ++ "'s Turn")
         ]
 
 
@@ -204,8 +182,8 @@ clearButton =
     button [ type_ "button", onClick Clear ] [ text "Restart" ]
 
 
-makeBoard : Model -> Html Msg
-makeBoard model =
+makeBoard : Array (Array Char) -> Html Msg
+makeBoard board =
     div [ class "board" ]
         [ ul []
             (List.indexedMap
@@ -213,7 +191,7 @@ makeBoard model =
                     makeBoardCells rowIndex <| Array.toList boardRow
                 )
              <|
-                Array.toList model.board
+                Array.toList board
             )
         ]
 
