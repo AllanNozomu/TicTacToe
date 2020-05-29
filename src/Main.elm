@@ -1,5 +1,6 @@
 module Main exposing (..)
 
+import Array exposing (Array)
 import Browser
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -12,34 +13,20 @@ import String
 
 
 type alias Model =
-    { board : List (List Char)
+    { board : Array (Array Char)
     , turn : Char
     , winner : Bool
     , draw : Bool
-    , columns : List (List Char)
-    , diagonals : List (List Char)
     }
 
 
 initModel : ( Model, Cmd msg )
 initModel =
     ( { board =
-            [ [ ' ', ' ', ' ' ]
-            , [ ' ', ' ', ' ' ]
-            , [ ' ', ' ', ' ' ]
-            ]
+            Array.initialize 3 <| always <| Array.initialize 3 <| always ' '
       , turn = 'X'
       , winner = False
       , draw = False
-      , columns =
-            [ [ ' ', ' ', ' ' ]
-            , [ ' ', ' ', ' ' ]
-            , [ ' ', ' ', ' ' ]
-            ]
-      , diagonals =
-            [ [ ' ', ' ', ' ' ]
-            , [ ' ', ' ', ' ' ]
-            ]
       }
     , Cmd.none
     )
@@ -99,101 +86,89 @@ update msg ( model, cmd ) =
                 )
 
 
-checkForWinner : List (List Char) -> Bool
+checkForWinner : Array (Array Char) -> Bool
 checkForWinner board =
     checkRow board || checkColumn board || checkDiagonals board
 
 
-checkDraw : List (List Char) -> Bool
+checkDraw : Array (Array Char) -> Bool
 checkDraw board =
-    not (List.concat board |> List.member ' ')
+    not (board |> Array.map (\row -> Array.toList row) |> Array.toList |> List.concat  |>  List.member ' ')
 
-
-allEqual : List Char -> Bool
-allEqual list =
-    let
-        value =
-            takeElement 0 list ' '
-    in
-    List.foldr
-        (\element status ->
-            if status && not (element == ' ') then
-                element == value
-            else
-                False
-        )
-        True
-        list
-
-
-takeElement : Int -> List a -> a -> a
-takeElement index list default =
-    case List.drop index list |> List.head of
-        Just l ->
-            l
-        Nothing ->
-            default
-
-
-checkDiagonals : List (List Char) -> Bool
+checkDiagonals : Array (Array Char) -> Bool
 checkDiagonals board =
     let
+        spaceEqualNothing : Maybe Char -> Char
+        spaceEqualNothing a =
+            case a of
+                Just b -> b
+                Nothing -> ' '
+
         diagonal1 =
-            List.indexedMap
+            board |> Array.indexedMap
                 (\index row ->
-                    takeElement index row ' '
+                    Array.get index row |> spaceEqualNothing
                 )
-                board
+                
 
         diagonal2 =
-            List.indexedMap
+            board |> Array.indexedMap
                 (\index row ->
-                    takeElement (2 - index) row ' '
+                    Array.get (Array.length board - index - 1) row |> spaceEqualNothing
                 )
-                board
+                
     in
-    allEqual diagonal1 || allEqual diagonal2
+    allEquals diagonal1 || allEquals diagonal2
 
 
-checkColumn : List (List Char) -> Bool
-checkColumn board =
-    List.map allEqual board |> List.foldr (||) False
-
-
-checkRow : List (List Char) -> Bool
+checkRow : Array (Array Char) -> Bool
 checkRow board =
+    board |> Array.map
+        (\line ->
+            allEquals line
+        ) |> Array.foldr (||) False
+
+checkColumn : Array (Array Char) -> Bool
+checkColumn board =
     let
-        rowsRes =
-            List.length board
-                |> List.range 0
-                |> List.map
-                    (\col ->
-                        List.map
-                            (\row ->
-                                takeElement col row ' '
-                            )
-                            board
-                            |> allEqual
-                    )
+        newLine = 
+            case Array.get 0 board of
+            Just a -> a
+            Nothing -> Array.empty
     in
-    rowsRes |> List.foldr (||) False
+    newLine |> Array.indexedMap (\index _ ->
+        Array.map (\row ->
+            case Array.get index row of
+                Just l -> l
+                _ -> ' '
+        ) board |> allEquals
+    ) |> Array.foldr (||) False
+
+allEquals : Array Char -> Bool
+allEquals a =
+    case Array.get 0 a of
+    Just ' ' -> 
+        False
+    Just l ->
+        Array.foldr (\ele acc -> acc && ele == l) True a
+    Nothing -> False
 
 
-updateCell : Model -> Int -> Int -> List (List Char)
-updateCell model posx posy =
-    List.indexedMap
-        (\y row ->
-            List.indexedMap
-                (\x cell ->
-                    if x == posx && y == posy && cell == ' ' then
-                        model.turn
+updateCell : Model -> Int -> Int -> Array (Array Char)
+updateCell model posy posx =
+    let
+        board =
+            model.board
 
-                    else
-                        cell
-                )
-                row
-        )
-        model.board
+        turn =
+            model.turn
+    in
+    case Array.get posx board of
+        Just line ->
+            Array.set posx (Array.set posy turn line) board
+
+        Nothing ->
+            model.board
 
 
 
@@ -235,9 +210,10 @@ makeBoard model =
         [ ul []
             (List.indexedMap
                 (\rowIndex boardRow ->
-                    makeBoardCells rowIndex boardRow
+                    makeBoardCells rowIndex <| Array.toList boardRow
                 )
-                model.board
+             <|
+                Array.toList model.board
             )
         ]
 
@@ -248,11 +224,16 @@ makeBoardCells y boardRow =
         (List.indexedMap
             (\x cell ->
                 div
-                    [ class "button",
-                    case cell of 
-                        'X' -> class "red"
-                        'O' -> class "blue"
-                        _ -> onClick (Place x y)
+                    [ class "button"
+                    , case cell of
+                        'X' ->
+                            class "red"
+
+                        'O' ->
+                            class "blue"
+
+                        _ ->
+                            onClick (Place x y)
                     ]
                     [ text
                         (String.fromChar cell)
