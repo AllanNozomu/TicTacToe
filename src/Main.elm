@@ -7,24 +7,17 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import String
 
+import Model exposing (Model)
+import Player exposing (Player)
 
 
 --Models
 
-
-type alias Model =
-    { board : Array (Array Char)
-    , turn : Char
-    , winner : Bool
-    , draw : Bool
-    }
-
-
 initModel : ( Model, Cmd msg )
 initModel =
     ( { board =
-            Array.initialize 3 <| always <| Array.initialize 3 <| always ' '
-      , turn = 'X'
+            Array.initialize 3 <| always <| Array.initialize 3 <| always Nothing
+      , turn = Player.X
       , winner = False
       , draw = False
       }
@@ -70,11 +63,11 @@ update msg ( model, cmd ) =
                         if newWinner then
                             model.turn
 
-                        else if model.turn == 'X' then
-                            'O'
+                        else if model.turn == Player.X then
+                            Player.O
 
                         else
-                            'X'
+                            Player.X
                 in
                 ( { model
                     | board = newBoard
@@ -86,64 +79,64 @@ update msg ( model, cmd ) =
                 )
 
 
-checkForWinner : Array (Array Char) -> Bool
+checkForWinner : Array(Array (Maybe Player)) -> Bool
 checkForWinner board =
     checkRow board || checkColumn board || checkDiagonals board
 
 
-checkDraw : Array (Array Char) -> Bool
+checkDraw : Array(Array (Maybe x)) -> Bool
 checkDraw board =
-    not (board |> Array.map (\row -> Array.toList row) |> Array.toList |> List.concat  |>  List.member ' ')
+    not (board |> Array.map (\row -> Array.toList row) |> Array.toList |> List.concat  |>  List.member Nothing)
 
-checkDiagonals : Array (Array Char) -> Bool
+checkDiagonals : Array(Array (Maybe x)) -> Bool
 checkDiagonals board =
     let
         diagonal1 =
             board |> Array.indexedMap
                 (\index row ->
-                    Array.get index row |> Maybe.withDefault ' '
+                    Array.get index row |> Maybe.withDefault Nothing
                 )
                 
         diagonal2 =
             board |> Array.indexedMap
                 (\index row ->
-                    Array.get (Array.length board - index - 1) row |> Maybe.withDefault ' '
+                    Array.get (Array.length board - index - 1) row |> Maybe.withDefault Nothing
                 )
     in
     allEquals diagonal1 || allEquals diagonal2
 
 
-checkRow : Array (Array Char) -> Bool
+checkRow : Array(Array (Maybe x)) -> Bool
 checkRow board =
     board 
         |> Array.map (\line -> allEquals line ) 
         |> Array.foldr (||) False
 
-checkColumn : Array (Array Char) -> Bool
+checkColumn : Array(Array (Maybe x)) -> Bool
 checkColumn board =
     Array.get 0 board
         |> Maybe.withDefault Array.empty 
         |> Array.indexedMap (\index _ ->
-                Array.map (\row -> Array.get index row |> Maybe.withDefault ' '
+                Array.map (\row -> Array.get index row |> Maybe.withDefault Nothing
             ) board 
             |> allEquals ) 
         |> Array.foldr (||) False
 
-allEquals : Array Char -> Bool
+allEquals : Array (Maybe x) -> Bool
 allEquals a =
     case Array.get 0 a of
-    Just ' ' -> 
+    Just Nothing -> 
         False
     Just l ->
         Array.foldr (\ele acc -> acc && ele == l) True a
     Nothing -> False
 
 
-updateCell : Array(Array Char) -> Char -> Int -> Int -> Array (Array Char)
+updateCell : Array(Array (Maybe Player)) -> Player -> Int -> Int -> Array(Array (Maybe Player))
 updateCell board turn posy posx =
     case Array.get posx board of
         Just line ->
-            Array.set posx (Array.set posy turn line) board
+            Array.set posx (Array.set posy (Just turn) line) board
 
         Nothing ->
             board
@@ -163,17 +156,17 @@ view ( model, cmd ) =
         ]
 
 
-showHeader : Bool -> Bool -> Char -> Html Msg
+showHeader : Bool -> Bool -> Player -> Html Msg
 showHeader winner draw turn =
     h1 []
         [ if winner then
-            text ("Winner = " ++ String.fromChar turn)
+            text <| "Winner = " ++ (Player.toString <| Just turn)
 
           else if draw then
             text "DRAW!"
 
           else
-            text (String.fromChar turn ++ "'s Turn")
+            text (Player.toString (Just turn) ++ "'s Turn")
         ]
 
 
@@ -182,21 +175,20 @@ clearButton =
     button [ type_ "button", onClick Clear ] [ text "Restart" ]
 
 
-makeBoard : Array (Array Char) -> Html Msg
+makeBoard : Array(Array (Maybe Player)) -> Html Msg
 makeBoard board =
     div [ class "board" ]
         [ ul []
             (List.indexedMap
                 (\rowIndex boardRow ->
-                    makeBoardCells rowIndex <| Array.toList boardRow
+                    makeBoardCells rowIndex <| boardRow
                 )
-             <|
-                Array.toList board
+             <| Array.toList board
             )
         ]
 
 
-makeBoardCells : Int -> List Char -> Html Msg
+makeBoardCells : Int -> Array (Maybe Player) -> Html Msg
 makeBoardCells y boardRow =
     li []
         (List.indexedMap
@@ -204,20 +196,20 @@ makeBoardCells y boardRow =
                 div
                     [ class "button"
                     , case cell of
-                        'X' ->
+                        Just Player.X ->
                             class "red"
 
-                        'O' ->
+                        Just Player.O ->
                             class "blue"
 
                         _ ->
                             onClick (Place x y)
                     ]
                     [ text
-                        (String.fromChar cell)
+                        <| Player.toString cell
                     ]
             )
-            boardRow
+            <| Array.toList boardRow
         )
 
 
