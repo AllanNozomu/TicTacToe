@@ -1,15 +1,20 @@
-module Player exposing (Player(..), toString, changeTurn)
+module Player exposing (Player(..), toString, changeTurn, toStringMaybe)
 
 type Player 
     = X
     | O
 
-toString : Maybe Player -> String
+toString : Player -> String
 toString p =
     case p of
-        Just X -> "X"
-        Just O -> "O"
-        Nothing -> ""
+        X -> "X"
+        O -> "O"
+
+toStringMaybe : Maybe Player -> String
+toStringMaybe m =
+    case m of
+        Just p -> toString p
+        _ -> ""
 
 changeTurn : Bool -> Player -> Player
 changeTurn win p =

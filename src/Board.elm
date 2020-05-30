@@ -2,6 +2,7 @@ module Board exposing (Board, BoardLine, checkForWinner, checkDraw, updateCell)
 
 import Player exposing (Player)
 import Array exposing (Array)
+import Utils exposing (..)
 
 type alias BoardLine = Array (Maybe Player)
 type alias Board = Array (BoardLine)
@@ -59,8 +60,8 @@ allEquals a =
     Nothing -> False
 
 
-updateCell : Board -> Player -> Int -> Int -> Board
-updateCell board turn posy posx =
+updateCell : Board -> Player -> Position -> Board
+updateCell board turn (posy, posx) =
     case Array.get posx board of
         Just line ->
             Array.set posx (Array.set posy (Just turn) line) board

@@ -8,6 +8,7 @@ import Array
 import Model exposing (..)
 import Board exposing (..)
 import Player exposing (..)
+import GameStatus exposing (..)
 import Update exposing (..)
 
 
@@ -15,23 +16,23 @@ view : ( Model, Cmd msg ) -> Html Msg
 view ( model, cmd ) =
     div []
         [ h1 [ class "titulo" ] [ text "Tic Tac Toe" ]
-        , showHeader model.winner model.draw model.turn
+        , showHeader model.gameStatus
         , makeBoard model.board
         , clearButton
         ]
 
 
-showHeader : Bool -> Bool -> Player -> Html Msg
-showHeader winner draw turn =
+showHeader : GameStatus -> Html Msg
+showHeader status =
     h1 []
-        [ if winner then
-            text <| "Winner = " ++ (Player.toString <| Just turn)
-
-          else if draw then
-            text "DRAW!"
-
-          else
-            text (Player.toString (Just turn) ++ "'s Turn")
+        [ 
+            case status of
+                Winner player ->
+                    text <| "Winner = " ++ (Player.toString player)
+                Draw -> 
+                    text "DRAW!"
+                Turn player ->
+                    text (Player.toString player ++ "'s Turn")
         ]
 
 
@@ -68,10 +69,10 @@ makeBoardCells y boardRow =
                             class "blue"
 
                         _ ->
-                            onClick (Place x y)
+                            onClick <| Place (x, y)
                     ]
                     [ text
-                        <| Player.toString cell
+                        <| Player.toStringMaybe cell
                     ]
             )
             <| Array.toList boardRow

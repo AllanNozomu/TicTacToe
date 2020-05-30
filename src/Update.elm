@@ -3,10 +3,12 @@ module Update exposing (update, Msg(..))
 import Model exposing (..)
 import Board exposing (..)
 import Player exposing (..)
+import GameStatus exposing (..)
+import Utils exposing (..)
 
 type Msg
     = Clear
-    | Place Int Int
+    | Place Position
 
 update : Msg -> ( Model, Cmd msg ) -> ( Model, Cmd msg )
 update msg ( model, cmd ) =
@@ -14,30 +16,35 @@ update msg ( model, cmd ) =
         Clear ->
             initModel
 
-        Place posx posy ->
-            if model.winner then
-                ( model, Cmd.none )
+        Place pos ->
+            case model.gameStatus of
+                Turn currPlayer ->
+                    let
+                        newBoard =
+                            Board.updateCell model.board currPlayer pos
 
-            else
-                let
-                    newBoard =
-                        Board.updateCell model.board model.turn posx posy
+                        newWinner =
+                            Board.checkForWinner newBoard
+                            
+                        isDraw =
+                            if newWinner then
+                                False
+                            else
+                                Board.checkDraw newBoard
 
-                    newWinner =
-                        Board.checkForWinner newBoard
-
-                    isDraw =
-                        if newWinner then
-                            False
-
-                        else
-                            Board.checkDraw newBoard
-                in
-                ( { model
-                    | board = newBoard
-                    , turn = Player.changeTurn newWinner model.turn
-                    , winner = newWinner
-                    , draw = isDraw
-                  }
-                , Cmd.none
-                )
+                        newStatus =
+                            if newWinner then
+                                Winner currPlayer
+                            else if isDraw then
+                                Draw
+                            else
+                                Turn <| Player.changeTurn newWinner currPlayer
+                    in
+                    ( { model
+                        | board = newBoard
+                        , gameStatus = newStatus
+                    }
+                    , Cmd.none
+                    )
+                _ -> 
+                    (model, Cmd.none)
