@@ -5624,6 +5624,7 @@ var $author$project$View$clearButton = A2(
 			$elm$html$Html$text('Restart')
 		]));
 var $elm$html$Html$div = _VirtualDom_node('div');
+var $elm$html$Html$footer = _VirtualDom_node('footer');
 var $elm$html$Html$h1 = _VirtualDom_node('h1');
 var $author$project$Update$Place = function (a) {
 	return {$: 'Place', a: a};
@@ -5655,25 +5656,34 @@ var $author$project$View$makeBoardCells = F2(
 					function (x, cell) {
 						return A2(
 							$elm$html$Html$div,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('button'),
-									function () {
+							A2(
+								$elm$core$List$cons,
+								$elm$html$Html$Attributes$class('button'),
+								function () {
 									if (cell.$ === 'Just') {
 										if (cell.a.$ === 'X') {
 											var _v1 = cell.a;
-											return $elm$html$Html$Attributes$class('red');
+											return _List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('red')
+												]);
 										} else {
 											var _v2 = cell.a;
-											return $elm$html$Html$Attributes$class('blue');
+											return _List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('blue')
+												]);
 										}
 									} else {
-										return $elm$html$Html$Events$onClick(
-											$author$project$Update$Place(
-												_Utils_Tuple2(x, y)));
+										return _List_fromArray(
+											[
+												$elm$html$Html$Events$onClick(
+												$author$project$Update$Place(
+													_Utils_Tuple2(x, y))),
+												$elm$html$Html$Attributes$class('unplacedButton')
+											]);
 									}
-								}()
-								]),
+								}()),
 							_List_fromArray(
 								[
 									$elm$html$Html$text(
@@ -5731,22 +5741,41 @@ var $author$project$View$view = function (_v0) {
 	var cmd = _v0.b;
 	return A2(
 		$elm$html$Html$div,
-		_List_Nil,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('container')
+			]),
 		_List_fromArray(
 			[
 				A2(
-				$elm$html$Html$h1,
+				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('titulo')
+						$elm$html$Html$Attributes$class('content')
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text('Tic Tac Toe')
+						A2(
+						$elm$html$Html$h1,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('titulo')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Tic Tac Toe')
+							])),
+						$author$project$View$showHeader(model.gameStatus),
+						$author$project$View$makeBoard(model.board),
+						$author$project$View$clearButton
 					])),
-				$author$project$View$showHeader(model.gameStatus),
-				$author$project$View$makeBoard(model.board),
-				$author$project$View$clearButton
+				A2(
+				$elm$html$Html$footer,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Made by allannozomu')
+					]))
 			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$sandbox(
