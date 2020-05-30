@@ -14,12 +14,15 @@ import Update exposing (..)
 
 view : ( Model, Cmd msg ) -> Html Msg
 view ( model, cmd ) =
-    div []
-        [ h1 [ class "titulo" ] [ text "Tic Tac Toe" ]
-        , showHeader model.gameStatus
-        , makeBoard model.board
-        , clearButton
-        ]
+    div [class "container"][
+        div [class "content"]
+            [ h1 [ class "titulo" ] [ text "Tic Tac Toe" ]
+            , showHeader model.gameStatus
+            , makeBoard model.board
+            , clearButton]
+        ,
+        footer [][text "Made by allannozomu"] 
+    ]
 
 
 showHeader : GameStatus -> Html Msg
@@ -28,7 +31,7 @@ showHeader status =
         [ 
             case status of
                 Winner player ->
-                    text <| "Winner = " ++ (Player.toString player)
+                    text <| "Winner = " ++ Player.toString player
                 Draw -> 
                     text "DRAW!"
                 Turn player ->
@@ -60,20 +63,18 @@ makeBoardCells y boardRow =
         (List.indexedMap
             (\x cell ->
                 div
-                    [ class "button"
-                    , case cell of
+                    (class "button" :: 
+                    case cell of
                         Just Player.X ->
-                            class "red"
+                            [class "red"]
 
                         Just Player.O ->
-                            class "blue"
+                            [class "blue"]
 
                         _ ->
-                            onClick <| Place (x, y)
-                    ]
-                    [ text
-                        <| Player.toStringMaybe cell
-                    ]
+                            [onClick <| Place (x, y), class "unplacedButton"]
+                    )
+                    [ text <| Player.toStringMaybe cell ]
             )
             <| Array.toList boardRow
         )

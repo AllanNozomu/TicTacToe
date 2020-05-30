@@ -14,7 +14,7 @@ checkForWinner board =
 
 checkDraw : Board -> Bool
 checkDraw board =
-    not (board |> Array.map (\row -> Array.toList row) |> Array.toList |> List.concat  |>  List.member Nothing)
+    not (board |> Array.map (\row -> Array.toList row) |> Array.toList |> List.concat |> List.member Nothing)
 
 checkDiagonals : Board -> Bool
 checkDiagonals board =
