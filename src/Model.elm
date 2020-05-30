@@ -1,7 +1,7 @@
-module Model exposing (..)
+module Model exposing (Model)
 
-import Array exposing (Array)
 import Player exposing (Player)
+import Board exposing (Board)
 
 type alias Model =
     { board : Board
@@ -9,6 +9,3 @@ type alias Model =
     , winner : Bool
     , draw : Bool
     }
-
-type alias BoardLine = Array (Maybe Player)
-type alias Board = Array (BoardLine)

@@ -6,8 +6,9 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 
-import Model exposing (Model, Board, BoardLine)
-import Player exposing (Player)
+import Model exposing (Model)
+import Player exposing (Player, Player(..))
+import Board exposing (Board, BoardLine)
 
 
 --Models
@@ -46,100 +47,26 @@ update msg ( model, cmd ) =
             else
                 let
                     newBoard =
-                        updateCell model.board model.turn posx posy
+                        Board.updateCell model.board model.turn posx posy
 
                     newWinner =
-                        checkForWinner newBoard
+                        Board.checkForWinner newBoard
 
                     isDraw =
                         if newWinner then
                             False
 
                         else
-                            checkDraw newBoard
-
-                    newTurn =
-                        if newWinner then
-                            model.turn
-
-                        else if model.turn == Player.X then
-                            Player.O
-
-                        else
-                            Player.X
+                            Board.checkDraw newBoard
                 in
                 ( { model
                     | board = newBoard
-                    , turn = newTurn
+                    , turn = Player.changeTurn newWinner model.turn
                     , winner = newWinner
                     , draw = isDraw
                   }
                 , Cmd.none
                 )
-
-
-checkForWinner : Board -> Bool
-checkForWinner board =
-    checkRow board || checkColumn board || checkDiagonals board
-
-
-checkDraw : Board -> Bool
-checkDraw board =
-    not (board |> Array.map (\row -> Array.toList row) |> Array.toList |> List.concat  |>  List.member Nothing)
-
-checkDiagonals : Board -> Bool
-checkDiagonals board =
-    let
-        diagonal1 =
-            board |> Array.indexedMap
-                (\index row ->
-                    Array.get index row |> Maybe.withDefault Nothing
-                )
-                
-        diagonal2 =
-            board |> Array.indexedMap
-                (\index row ->
-                    Array.get (Array.length board - index - 1) row |> Maybe.withDefault Nothing
-                )
-    in
-    allEquals diagonal1 || allEquals diagonal2
-
-
-checkRow : Board -> Bool
-checkRow board =
-    board 
-        |> Array.map (\line -> allEquals line ) 
-        |> Array.foldr (||) False
-
-checkColumn : Board -> Bool
-checkColumn board =
-    Array.get 0 board
-        |> Maybe.withDefault Array.empty 
-        |> Array.indexedMap (\index _ ->
-                Array.map (\row -> Array.get index row |> Maybe.withDefault Nothing
-            ) board 
-            |> allEquals ) 
-        |> Array.foldr (||) False
-
-allEquals : BoardLine -> Bool
-allEquals a =
-    case Array.get 0 a of
-    Just Nothing -> 
-        False
-    Just l ->
-        Array.foldr (\ele acc -> acc && ele == l) True a
-    Nothing -> False
-
-
-updateCell : Board -> Player -> Int -> Int -> Board
-updateCell board turn posy posx =
-    case Array.get posx board of
-        Just line ->
-            Array.set posx (Array.set posy (Just turn) line) board
-
-        Nothing ->
-            board
-
 
 
 --View
