@@ -5,9 +5,8 @@ import Browser
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import String
 
-import Model exposing (Model)
+import Model exposing (Model, Board, BoardLine)
 import Player exposing (Player)
 
 
@@ -79,16 +78,16 @@ update msg ( model, cmd ) =
                 )
 
 
-checkForWinner : Array(Array (Maybe Player)) -> Bool
+checkForWinner : Board -> Bool
 checkForWinner board =
     checkRow board || checkColumn board || checkDiagonals board
 
 
-checkDraw : Array(Array (Maybe x)) -> Bool
+checkDraw : Board -> Bool
 checkDraw board =
     not (board |> Array.map (\row -> Array.toList row) |> Array.toList |> List.concat  |>  List.member Nothing)
 
-checkDiagonals : Array(Array (Maybe x)) -> Bool
+checkDiagonals : Board -> Bool
 checkDiagonals board =
     let
         diagonal1 =
@@ -106,13 +105,13 @@ checkDiagonals board =
     allEquals diagonal1 || allEquals diagonal2
 
 
-checkRow : Array(Array (Maybe x)) -> Bool
+checkRow : Board -> Bool
 checkRow board =
     board 
         |> Array.map (\line -> allEquals line ) 
         |> Array.foldr (||) False
 
-checkColumn : Array(Array (Maybe x)) -> Bool
+checkColumn : Board -> Bool
 checkColumn board =
     Array.get 0 board
         |> Maybe.withDefault Array.empty 
@@ -122,7 +121,7 @@ checkColumn board =
             |> allEquals ) 
         |> Array.foldr (||) False
 
-allEquals : Array (Maybe x) -> Bool
+allEquals : BoardLine -> Bool
 allEquals a =
     case Array.get 0 a of
     Just Nothing -> 
@@ -132,7 +131,7 @@ allEquals a =
     Nothing -> False
 
 
-updateCell : Array(Array (Maybe Player)) -> Player -> Int -> Int -> Array(Array (Maybe Player))
+updateCell : Board -> Player -> Int -> Int -> Board
 updateCell board turn posy posx =
     case Array.get posx board of
         Just line ->
@@ -175,7 +174,7 @@ clearButton =
     button [ type_ "button", onClick Clear ] [ text "Restart" ]
 
 
-makeBoard : Array(Array (Maybe Player)) -> Html Msg
+makeBoard : Board -> Html Msg
 makeBoard board =
     div [ class "board" ]
         [ ul []
@@ -188,7 +187,7 @@ makeBoard board =
         ]
 
 
-makeBoardCells : Int -> Array (Maybe Player) -> Html Msg
+makeBoardCells : Int -> BoardLine -> Html Msg
 makeBoardCells y boardRow =
     li []
         (List.indexedMap

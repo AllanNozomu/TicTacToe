@@ -4,8 +4,11 @@ import Array exposing (Array)
 import Player exposing (Player)
 
 type alias Model =
-    { board : Array (Array (Maybe Player))
+    { board : Board
     , turn : Player
     , winner : Bool
     , draw : Bool
     }
+
+type alias BoardLine = Array (Maybe Player)
+type alias Board = Array (BoardLine)
