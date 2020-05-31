@@ -5581,6 +5581,7 @@ var $author$project$Update$update = F2(
 			}
 		}
 	});
+var $elm$html$Html$a = _VirtualDom_node('a');
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
@@ -5626,6 +5627,13 @@ var $author$project$View$clearButton = A2(
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$footer = _VirtualDom_node('footer');
 var $elm$html$Html$h1 = _VirtualDom_node('h1');
+var $elm$html$Html$Attributes$href = function (url) {
+	return A2(
+		$elm$html$Html$Attributes$stringProperty,
+		'href',
+		_VirtualDom_noJavaScriptUri(url));
+};
+var $elm$html$Html$i = _VirtualDom_node('i');
 var $author$project$Update$Place = function (a) {
 	return {$: 'Place', a: a};
 };
@@ -5714,6 +5722,7 @@ var $author$project$View$makeBoard = function (board) {
 					$elm$core$Array$toList(board)))
 			]));
 };
+var $elm$html$Html$p = _VirtualDom_node('p');
 var $author$project$View$showHeader = function (status) {
 	return A2(
 		$elm$html$Html$h1,
@@ -5774,7 +5783,31 @@ var $author$project$View$view = function (_v0) {
 				_List_Nil,
 				_List_fromArray(
 					[
-						$elm$html$Html$text('Made by allannozomu')
+						A2(
+						$elm$html$Html$p,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Made with '),
+								A2(
+								$elm$html$Html$i,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('devicon-elm-plain')
+									]),
+								_List_Nil),
+								$elm$html$Html$text(' by '),
+								A2(
+								$elm$html$Html$a,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$href('https://github.com/allannozomu/tictactoe')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('allannozomu')
+									]))
+							]))
 					]))
 			]));
 };
