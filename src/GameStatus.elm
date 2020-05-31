@@ -1,6 +1,6 @@
-module GameStatus exposing (..)
+module GameStatus exposing (GameStatus(..))
 
-import Player exposing (..)
+import Player exposing (Player)
 
 type GameStatus
     = Turn Player

@@ -1,18 +1,18 @@
 module View exposing (view)
 
 import Array
-import Board exposing (..)
-import GameStatus exposing (..)
+import Board exposing (Board, BoardLine)
+import GameStatus exposing (GameStatus(..))
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import Model exposing (..)
-import Player exposing (..)
-import Update exposing (..)
+import Model exposing (Model)
+import Player exposing (Player(..))
+import Update exposing (Msg(..))
 
 
 view : ( Model, Cmd msg ) -> Html Msg
-view ( model, cmd ) =
+view ( model, _ ) =
     div [ class "container" ]
         [ div [ class "content" ]
             [ h1 [ class "titulo" ] [ text "Tic Tac Toe" ]

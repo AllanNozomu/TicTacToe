@@ -2,7 +2,7 @@ module Board exposing (Board, BoardLine, checkForWinner, checkDraw, updateCell)
 
 import Player exposing (Player)
 import Array exposing (Array)
-import Utils exposing (..)
+import Utils exposing (Position)
 
 type alias BoardLine = Array (Maybe Player)
 type alias Board = Array (BoardLine)

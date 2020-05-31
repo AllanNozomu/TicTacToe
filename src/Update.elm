@@ -1,17 +1,17 @@
 module Update exposing (update, Msg(..))
 
-import Model exposing (..)
-import Board exposing (..)
-import Player exposing (..)
-import GameStatus exposing (..)
-import Utils exposing (..)
+import Model exposing (Model, initModel)
+import Board
+import Player
+import GameStatus exposing (GameStatus(..))
+import Utils exposing (Position)
 
 type Msg
     = Clear
     | Place Position
 
 update : Msg -> ( Model, Cmd msg ) -> ( Model, Cmd msg )
-update msg ( model, cmd ) =
+update msg ( model, _ ) =
     case msg of
         Clear ->
             initModel

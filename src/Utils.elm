@@ -1,3 +1,3 @@
-module Utils exposing (..)
+module Utils exposing (Position)
 
 type alias Position = (Int, Int)
